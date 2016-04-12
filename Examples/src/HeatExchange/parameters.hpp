@@ -25,7 +25,7 @@ struct parameters
   //! Number of elements
   int M;
   //! Constructor takes default values
-    std::string newname;  
+  std::string newname;  
   //! New name for result file
 
   parameters():
