@@ -33,6 +33,10 @@ SRCS=$(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)
 # get all headers in the working directory
 HEADERS=$(wildcard *.hpp)
+# modifica per aggiornare il gnoplot
+CXXFLAGS+= -I${mkBoostInc} -std=c++11
+LIBD+= -L${mkBoostLib}
+
 #
 exe_sources=$(filter main%.cpp,$(SRCS))
 EXEC=$(exe_sources:.cpp=)
