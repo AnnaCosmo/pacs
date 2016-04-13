@@ -53,7 +53,7 @@ int main(int argc, char** argv)
   // to show a possible  use of references)
   const int&    itermax= param.itermax;   //max number of iteration for Gauss-Siedel
   const double& toler=param.toler;   // Tolerance for stopping criterion
-  // Here I use auto (remember that you need const and & if you want constant references)
+  const bool& norm=param.norm;// Here I use auto (remember that you need const and & if you want constant references)
   const auto& L= param.L;  // Bar length
   const auto& a1=param.a1; // First longitudinal dimension
   const auto& a2=param.a2; //  Second longitudinal dimension
@@ -84,25 +84,60 @@ int main(int argc, char** argv)
   // Stopping criteria epsilon<=toler
   
   int iter=0;
-  double xnew, epsilon;
+  double xnew, xold, epsilon;
+
+if(norm==1){ //if norm L2 is required 
      do
        { epsilon=0.;
+         
+	 //the first value is always 0 due to Dirichlet condition
+	 
 
 	 // first M-1 row of linear system
          for(int m=1;m < M;m++)
          {   
 	   xnew  = (theta[m-1]+theta[m+1])/(2.+h*h*act);
-	   epsilon += (xnew-theta[m])*(xnew-theta[m]);
+	   epsilon+=h*(xnew-theta[m])*(xnew-theta[m]);
 	   theta[m] = xnew;
          }
 
 	 //Last row
 	 xnew = theta[M-1]; 
-	 epsilon += (xnew-theta[M])*(xnew-theta[M]);
+	 epsilon+=h*(xnew-theta[M])*(xnew-theta[M])/2;
 	 theta[M]=  xnew; 
 
 	 iter=iter+1;     
        }while((sqrt(epsilon) > toler) && (iter < itermax) );
+	}
+else {  //if norm H1 is required
+   do
+       { epsilon=0.;
+	 xold=theta[0];
+	
+	 // first M-1 row of linear system
+         for(int m=1;m < M;m++)
+         { 
+	   xnew  = (theta[m-1]+theta[m+1])/(2.+h*h*act);
+	//il secondo termine è la norma del gradiente (l'h del calcolo dell'integrale e una della derivata si semplificano)
+           epsilon += h*(xnew-theta[m])*(xnew-theta[m]);
+	   epsilon +=((xnew-theta[m-1])-(theta[m]-xold))*((xnew-theta[m-1])-(theta[m]-xold))/h;
+           xold=theta[m];
+	   theta[m] = xnew;
+         }
+
+	 //Last row
+	 xnew = theta[M-1]; 
+	 epsilon += h*(xnew-theta[M])*(xnew-theta[M])/2;
+	 epsilon +=((xnew-theta[M-1])-(theta[M]-xold))*((xnew-theta[M-1])-(theta[M]-xold))/h;
+	 theta[M]=  xnew; 
+
+	 iter=iter+1;     
+       }while((sqrt(epsilon) > toler) && (iter < itermax) );
+   }
+/*else{ //if norm is neither L2 nor H1
+	cout<<"Not recognized parameter for the norm"<<endl;
+	status=1;
+}*/
 
     if(iter<itermax)
       cout << "M="<<M<<"  Convergence in "<<iter<<" iterations"<<endl;
@@ -118,7 +153,6 @@ int main(int argc, char** argv)
     vector<double> thetaa(M+1);
      for(int m=0;m <= M;m++)
        thetaa[m]=Te+(To-Te)*cosh(sqrt(act)*(1-m*h))/cosh(sqrt(act));
-
      // writing results with format
      // x_i u_h(x_i) u(x_i) and lauch gnuplot 
 
@@ -127,21 +161,21 @@ int main(int argc, char** argv)
      std::vector<double> sol(M+1);
      std::vector<double> exact(M+1);
 
-     cout<<"Result file: "<<newfilename<<endl; //print of the name of the file with result
+     cout<<"Result file: "<<newfilename<<endl; //print of the name of the file with the result
      ofstream f(newfilename); 
      for(int m = 0; m<= M; m++)
        {
 	 // \t writes a tab 
          f<<m*h*L<<"\t"<<Te*(1.+theta[m])<<"\t"<<thetaa[m]<<endl;
 	 // An example of use of tie and tuples!
-         
+         // indeed tie unpacks the tuple 
 	 std::tie(coor[m],sol[m],exact[m])=
 	   std::make_tuple(m*h*L,Te*(1.+theta[m]),thetaa[m]);
        }
      // Using temporary files (another nice use of tie)
-     // gp<<"plot"<<gp.file1d(std::tie(coor,sol))<<
-    //   "w lp title 'uh',"<< gp.file1d(std::tie(coor,exact))<<
-    //  "w l title 'uex'"<<std::endl;
+      gp<<"plot"<<gp.file1d(std::tie(coor,sol))<<
+       "w lp title 'uh',"<< gp.file1d(std::tie(coor,exact))<<
+      "w l title 'uex'"<<std::endl;
      f.close();
      return status;
 }

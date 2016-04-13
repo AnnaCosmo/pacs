@@ -23,6 +23,7 @@ parameters readParameters(std::string const & filename,bool verbose)
   // Read parameters from getpot ddata base
   values.itermax=ifile("itermax",defaults.itermax);
   values.toler=ifile("toler",defaults.toler);
+  values.norm=ifile("norm",defaults.norm);
   values.L=ifile("L",defaults.L);
   values.a1=ifile("a1",defaults.a1);
   values.a2=ifile("a2",defaults.a2);
