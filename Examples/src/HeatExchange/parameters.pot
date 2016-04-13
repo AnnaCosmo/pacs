@@ -5,7 +5,7 @@ itermax=1000000
 # Tolerance for stopping criterion
 toler=1.0e-8
 # Norm for tolerance (write L2 or H1)
-norm=Rs
+norm=L2
 # Bar length
 L=40.
 # First longitudinal dimension
@@ -23,4 +23,4 @@ hc=200.0e-6
 # Number of elements
 M=11
 # Name for result file
-newResult=result.dat
+newResult=resultL2.dat
