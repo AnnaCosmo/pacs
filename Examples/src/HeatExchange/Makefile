@@ -33,6 +33,9 @@ SRCS=$(wildcard *.cpp)
 OBJS = $(SRCS:.cpp=.o)
 # get all headers in the working directory
 HEADERS=$(wildcard *.hpp)
+# to use gnuplot
+CXXFLAGS+=-I${mkBoostInc}
+LIBD+=-L${mkBoostLib}
 #
 exe_sources=$(filter main%.cpp,$(SRCS))
 EXEC=$(exe_sources:.cpp=)
