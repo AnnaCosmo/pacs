@@ -22,3 +22,7 @@ hc=200.0e-6
 M=11
 # Name for result file
 newResult=newresult.dat
+# output=file if you want a file for result
+# output=plot if you want only the plot
+# output=both if you want plot and result file
+output=plot

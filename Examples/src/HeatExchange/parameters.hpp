@@ -27,6 +27,8 @@ struct parameters
   //! Constructor takes default values
   std::string newname;  
   //! New name for result file
+  std::string output;  
+  //! To know which output is required
 
   parameters():
     itermax(1000000),
@@ -39,7 +41,8 @@ struct parameters
     k(0.164),
     hc(1.e-6*200.),
     M(100),
-    newname("newresult.dat")
+    newname("newresult.dat"),
+    output("both")
   {}
 };
 //! Prints parameters
