@@ -4,8 +4,8 @@ MMAX=501
 itermax=1000000
 # Tolerance for stopping criterion
 toler=1.0e-8
-# Norm for tolerance
-norm=1
+# Norm for tolerance (write L2 or H1)
+norm=Rs
 # Bar length
 L=40.
 # First longitudinal dimension

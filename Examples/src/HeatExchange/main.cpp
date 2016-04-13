@@ -2,6 +2,7 @@
 #include <cmath> // (for sqrt)
 #include <vector>
 #include <tuple>
+#include <string.h>
 #include "readParameters.hpp"
 #include "GetPot.hpp"
 #include "gnuplot-iostream.hpp"// interface with gnuplot
@@ -53,7 +54,7 @@ int main(int argc, char** argv)
   // to show a possible  use of references)
   const int&    itermax= param.itermax;   //max number of iteration for Gauss-Siedel
   const double& toler=param.toler;   // Tolerance for stopping criterion
-  const bool& norm=param.norm;// Here I use auto (remember that you need const and & if you want constant references)
+  const auto& norm=param.norm;// Here I use auto (remember that you need const and & if you want constant references)
   const auto& L= param.L;  // Bar length
   const auto& a1=param.a1; // First longitudinal dimension
   const auto& a2=param.a2; //  Second longitudinal dimension
@@ -86,7 +87,7 @@ int main(int argc, char** argv)
   int iter=0;
   double xnew, xold, epsilon;
 
-if(norm==1){ //if norm L2 is required 
+if(norm=="L2"){ //if norm L2 is required 
      do
        { epsilon=0.;
          
@@ -109,7 +110,7 @@ if(norm==1){ //if norm L2 is required
 	 iter=iter+1;     
        }while((sqrt(epsilon) > toler) && (iter < itermax) );
 	}
-else {  //if norm H1 is required
+else if(norm=="H1"){  //if norm H1 is required
    do
        { epsilon=0.;
 	 xold=theta[0];
@@ -134,14 +135,14 @@ else {  //if norm H1 is required
 	 iter=iter+1;     
        }while((sqrt(epsilon) > toler) && (iter < itermax) );
    }
-/*else{ //if norm is neither L2 nor H1
-	cout<<"Not recognized parameter for the norm"<<endl;
+else{ //if norm is neither L2 nor H1
+	cout<<"Norm for tolerance not recognized"<<endl;
 	status=1;
-}*/
+}
 
-    if(iter<itermax)
+    if(iter<itermax && iter>0)
       cout << "M="<<M<<"  Convergence in "<<iter<<" iterations"<<endl;
-    else
+    else if (status!=1)
       {
 	cerr << "NOT CONVERGING in "<<itermax<<" iterations "<<
 	  "||dx||="<<sqrt(epsilon)<<endl;

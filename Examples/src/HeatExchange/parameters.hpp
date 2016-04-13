@@ -9,7 +9,7 @@ struct parameters
   //! Tolerance for stopping criterion
   double  toler;
   //! Bar length
-  bool norm;
+  std::string norm;
   //norm for the control of the tolerance
    double L;
   //! First longitudinal dimension
@@ -33,7 +33,7 @@ struct parameters
   parameters():
     itermax(1000000),
     toler(1e-8),
-    norm(true),
+    norm("L2"),
     L(40.),
     a1(4.),
     a2(50.),
