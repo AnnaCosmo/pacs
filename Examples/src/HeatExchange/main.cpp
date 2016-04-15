@@ -51,8 +51,6 @@ int main(int argc, char** argv)
   // Transfer parameters to local variables
   // I use references to save memory (not really an issue here, it is just
   // to show a possible  use of references)
-  const int&    itermax= param.itermax;   //max number of iteration for Gauss-Siedel
-  const double& toler=param.toler;   // Tolerance for stopping criterion
   // Here I use auto (remember that you need const and & if you want constant references)
   const auto& L= param.L;  // Bar length
   const auto& a1=param.a1; // First longitudinal dimension
@@ -73,46 +71,39 @@ int main(int argc, char** argv)
   
   // Solution vector
   std::vector<double> theta(M+1);
+  //vector used for the thomas algorithm
+  std::vector<double> y(M);
   
-  // Gauss Siedel is initialised with a linear variation
-  // of T
-  
-  for(unsigned int m=0;m <= M;++m)
-     theta[m]=(1.-m*h)*(To-Te)/Te;
-  
-  // Gauss-Seidel
-  // epsilon=||x^{k+1}-x^{k}||
-  // Stopping criteria epsilon<=toler
-  
-  int iter=0;
-  double xnew, epsilon;
-     do
-       { epsilon=0.;
 
-	 // first M-1 row of linear system
-         for(int m=1;m < M;m++)
-         {   
-	   xnew  = (theta[m-1]+theta[m+1])/(2.+h*h*act);
-	   epsilon += (xnew-theta[m])*(xnew-theta[m]);
-	   theta[m] = xnew;
-         }
+  theta[0]=(To-Te);
+  y[0]=theta[0];
+    
+  //three vector to implement the tridiagonal matrix
+  std::vector<double> a(M,2.+h*h*act);     //diagonale
+  std::vector<double> b(M-1,-1.);   //sopradiagonale
+  std::vector<double> c(M-1,-1.);   //sottodiagonale
 
-	 //Last row
-	 xnew = theta[M-1]; 
-	 epsilon += (xnew-theta[M])*(xnew-theta[M]);
-	 theta[M]=  xnew; 
+  a[M-1]=1.;
 
-	 iter=iter+1;     
-       }while((sqrt(epsilon) > toler) && (iter < itermax) );
+//creating coeff. for thomas algorithm
+  for(unsigned int m=0;m < M-1;++m){
+     c[m]=c[m]/a[m];
+     a[m+1]=a[m+1]+c[m];}
 
-    if(iter<itermax)
-      cout << "M="<<M<<"  Convergence in "<<iter<<" iterations"<<endl;
-    else
-      {
-	cerr << "NOT CONVERGING in "<<itermax<<" iterations "<<
-	  "||dx||="<<sqrt(epsilon)<<endl;
-	status=1;
-      }
+
+ for(unsigned int m=1;m<M;++m){
+   y[m]=-c[m-1]*y[m-1];
+}
+
+ theta[M]=y[M-1]/a[M-1]; //remember that vector theta has one further component than y
+
+
+ for(int m=M-1;m>0;--m){
+   theta[m]=(y[m-1]-b[m-1]*theta[m+1])/a[m-1];
+}
+
+
+
 
  // Analitic solution
 
@@ -135,11 +126,11 @@ int main(int argc, char** argv)
      for(int m = 0; m<= M; m++)
        {
 	 // \t writes a tab 
-         f<<m*h*L<<"\t"<<Te*(1.+theta[m])<<"\t"<<thetaa[m]<<endl;
+         f<<m*h*L<<"\t"<<Te+theta[m]<<"\t"<<thetaa[m]<<endl;
 	 // An example of use of tie and tuples!
          
 	 std::tie(coor[m],sol[m],exact[m])=
-	   std::make_tuple(m*h*L,Te*(1.+theta[m]),thetaa[m]);
+	   std::make_tuple(m*h*L,Te+theta[m],thetaa[m]);
        }
      // Using temporary files (another nice use of tie)
       gp<<"plot"<<gp.file1d(std::tie(coor,sol))<<
@@ -154,7 +145,7 @@ int main(int argc, char** argv)
      for(int m = 0; m<= M; m++)
        {
          // \t writes a tab 
-         f<<m*h*L<<"\t"<<Te*(1.+theta[m])<<"\t"<<thetaa[m]<<endl;
+         f<<m*h*L<<"\t"<<Te+theta[m]<<"\t"<<thetaa[m]<<endl;
         }
 
      f.close();
@@ -164,13 +155,12 @@ int main(int argc, char** argv)
      for(int m = 0; m<= M; m++)
        {
 	 std::tie(coor[m],sol[m],exact[m])=
-	   std::make_tuple(m*h*L,Te*(1.+theta[m]),thetaa[m]);
+	   std::make_tuple(m*h*L,Te+theta[m],thetaa[m]);
        }
      // Using temporary files (another nice use of tie)
       gp<<"plot"<<gp.file1d(std::tie(coor,sol))<<
        "w lp title 'uh',"<< gp.file1d(std::tie(coor,exact))<<
       "w l title 'uex'"<<std::endl;
 }
-
      return status;
 }

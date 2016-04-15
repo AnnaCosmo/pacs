@@ -19,10 +19,10 @@ k=0.164
 # Convection coefficient
 hc=200.0e-6
 # Number of elements
-M=11
+M=41
 # Name for result file
-newResult=newresult.dat
+newResult=result.dat
 # output=file if you want a file for result
 # output=plot if you want only the plot
 # output=both if you want plot and result file
-output=plot
+output=both
