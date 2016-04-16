@@ -22,6 +22,14 @@
     "Simulation numerique an C++" di I. Danaila, F. Hecht e
     O. Pironneau.
 */
+
+/*EXPLANATION:
+This is the main of the solution to challenge 1.3. I implemented the 
+thomas algorithm using three vector which represents first the explicit 
+matrix, then the two matrixes of the LU decomposition (used for the resolution).
+It's possible to chose both the type of the output and, in case, the name of 
+the output file (in parameters.pot)*/ 
+
 //! helper function
 void printHelp()
 {
@@ -79,9 +87,9 @@ int main(int argc, char** argv)
   y[0]=theta[0];
     
   //three vector to implement the tridiagonal matrix
-  std::vector<double> a(M,2.+h*h*act);     //diagonale
-  std::vector<double> b(M-1,-1.);   //sopradiagonale
-  std::vector<double> c(M-1,-1.);   //sottodiagonale
+  std::vector<double> a(M,2.+h*h*act);     //main diagonal
+  std::vector<double> b(M-1,-1.);   //first diagonal above the main one
+  std::vector<double> c(M-1,-1.);   //first diagonal below the main one
 
   a[M-1]=1.;
 
