@@ -23,6 +23,17 @@
     "Simulation numerique an C++" di I. Danaila, F. Hecht e
     O. Pironneau.
 */
+
+/*EXPLANATION:
+This is the main of the solution to challenge 1.2.
+To compare the two implemented norms (L2 and H1) is enough to 
+rum the script.sh file. The number of elements is 11, but it 
+is possible to change it in the files parametersL2.pot parametersH1.pot
+
+To chose manually which norm to use for the convergence tolerance 
+you have to modify the attribute "norm" in parameters.pot*/ 
+
+
 //! helper function
 void printHelp()
 {
@@ -119,8 +130,9 @@ else if(norm=="H1"){  //if norm H1 is required
          for(int m=1;m < M;m++)
          { 
 	   xnew  = (theta[m-1]+theta[m+1])/(2.+h*h*act);
-	//il secondo termine è la norma del gradiente (l'h del calcolo dell'integrale e una della derivata si semplificano)
+	// L2 norm of the function
            epsilon += h*(xnew-theta[m])*(xnew-theta[m]);
+	// L2 norm of the gradient
 	   epsilon +=((xnew-theta[m-1])-(theta[m]-xold))*((xnew-theta[m-1])-(theta[m]-xold))/h;
            xold=theta[m];
 	   theta[m] = xnew;
@@ -149,8 +161,9 @@ else{ //if norm is neither L2 nor H1
 	status=1;
       }
 
- // Analitic solution
+if(iter>0){
 
+ // Analitic solution
     vector<double> thetaa(M+1);
      for(int m=0;m <= M;m++)
        thetaa[m]=Te+(To-Te)*cosh(sqrt(act)*(1-m*h))/cosh(sqrt(act));
@@ -178,5 +191,6 @@ else{ //if norm is neither L2 nor H1
        "w lp title 'uh',"<< gp.file1d(std::tie(coor,exact))<<
       "w l title 'uex'"<<std::endl;
      f.close();
+}
      return status;
 }
