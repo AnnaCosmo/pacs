@@ -3,6 +3,7 @@ TEST_OBJS = test_matrix_mult.o test_gauss_seidel.o test_solve.o
 TESTS = test_matrix_mult test_gauss_seidel test_solve
 HEADERS = matrix.h
 SHARED_EXT = so
+CXXFLAGS= -std=c++11 -fPIC
 
 .PHONY : tests
 

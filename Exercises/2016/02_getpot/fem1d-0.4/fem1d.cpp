@@ -17,15 +17,13 @@ int main (int argc, char **argv)
   const unsigned int nnodes = cl.follow (100, 2, "-n", "-nnodes");
 
   mesh m (a, b, nnodes);
-  matrix A(nnodes);
+ Eigen::MatrixXd A(nnodes,nnodes);
 
-  matrix mloc(2);
+  Eigen::Matrix2d mloc;
   for (unsigned int iel = 0; iel < m.nels; ++iel)
     {
 
-      std::fill (mloc.get_data (),
-                 mloc.get_data () + 4,
-                 0.0);
+      mloc << 0,0,0,0;
       
       for (unsigned int inode = 0; inode < 2; ++inode)
         {
@@ -40,24 +38,25 @@ int main (int argc, char **argv)
         }
     }
 
-  matrix f(nnodes, 1);
-  matrix vloc(2, 1);
+  Eigen::VectorXd f(nnodes);
+  Eigen::Vector2d vloc;
   
   for (unsigned int iel = 0; iel < m.nels; ++iel)
     {
-      std::fill (mloc.get_data (),
-                 mloc.get_data () + 2,
-                 0.0);
-      
+      //std::fill (mloc.get_data (),
+        //         mloc.get_data () + 2,
+         //        0.0);
+     vloc << 0,0;     
+
       for (unsigned int inode = 0; inode < 2; ++inode)
         {
-          vloc(inode, 0) = m.h / 2.0;
-          f(m.elements[iel][inode], 0) += vloc(inode, 0);
+          vloc(inode) = m.h / 2.0;
+          f(m.elements[iel][inode]) += vloc(inode);
         }
     }
 
-  f(0, 0) = 0;
-  f(nnodes - 1, 0) = 0;
+  f(0) = 0;
+  f(nnodes) = 0;
 
   A(0,0) = 1.0;
   A(nnodes-1,nnodes-1) = 1.0;
@@ -68,11 +67,10 @@ int main (int argc, char **argv)
     }
 
   
-  matrix uh(f);
-  A.solve (uh);
+ Eigen::VectorXd uh = A.partialPivLu ().solve (f);
 
   for (unsigned int ii = 0; ii < nnodes; ++ii)
-    std::cout << uh(ii, 0) << std:: endl;
+    std::cout << uh(ii) << std:: endl;
       
   return 0;
 };

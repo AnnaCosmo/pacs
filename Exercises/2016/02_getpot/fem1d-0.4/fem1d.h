@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
-
+#include <Eigen/Dense>
 #include "mesh.h"
 
 
