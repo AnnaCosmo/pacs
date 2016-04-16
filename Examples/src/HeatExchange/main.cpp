@@ -22,6 +22,16 @@
     "Simulation numerique an C++" di I. Danaila, F. Hecht e
     O. Pironneau.
 */
+
+
+/*
+EXPLANATION:
+Solution of challenge 1.1 with the additional point.
+In the parameters.pot file the type of output and the name 
+for the result file can be decided.
+
+*/
+
 //! helper function
 void printHelp()
 {
